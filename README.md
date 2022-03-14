@@ -6,4 +6,5 @@ https://devpost.com/software/fifteen-match
 
 Screenshots of the app
 
-![Dark Theme](images/square_collection.png) ![Dark Theme](images/square_level.png)
+![Dark Theme](images/square_collection.png) 
+![Dark Theme](images/square_level.png)
