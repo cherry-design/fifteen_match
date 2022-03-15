@@ -8,7 +8,7 @@ The app was developed mainly for smartphones, but I also made a web version of t
 
 http://cherry-design.github.io/fifteen_match/
 
-creenshots of the app.
+Screenshots of the app.
 
 ![Dark Theme](images/square_collection.png) 
 ![Dark Theme](images/square_level.png)
