@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../models/models.dart';
 import '../typography/text_styles.dart';
 import '../views/views.dart';
@@ -111,7 +112,12 @@ class _LevelPageState extends State<LevelPage> {
       }
 
       // Trying to move piece
-      game.move(piece);
+      bool isMoved = game.move(piece);
+
+      // Playing click sound
+      if (isMoved) {
+        SystemSound.play(SystemSoundType.click);
+      }
     });
 
     // Checking if the puzzle is solved

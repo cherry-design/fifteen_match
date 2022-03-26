@@ -133,7 +133,7 @@ class Game {
   }
 
   /// Moves piece
-  void move(Piece piece) {
+  bool move(Piece piece) {
     Piece emptyPiece = _getEmptyPiece();
 
     // Finding the current position of tje empty Piece
@@ -164,6 +164,10 @@ class Game {
 
       // Increase counter
       steps++;
+
+      return true;
     }
+
+    return false;
   }
 }
