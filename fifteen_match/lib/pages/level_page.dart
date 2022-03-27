@@ -23,7 +23,7 @@ class LevelPage extends StatefulWidget {
   State<LevelPage> createState() => _LevelPageState();
 }
 
-class _LevelPageState extends State<LevelPage> {
+class _LevelPageState extends State<LevelPage> with WidgetsBindingObserver {
   // Main game object
   late Game game;
 
@@ -35,11 +35,14 @@ class _LevelPageState extends State<LevelPage> {
   bool timerActive = false;
 
   // AudioPlayer for background music
-  final assetsAudioPlayer = AssetsAudioPlayer();
+  final _assetsAudioPlayer = AssetsAudioPlayer();
 
   @override
   void initState() {
     super.initState();
+
+    // Add observer to handle app state
+    WidgetsBinding.instance!.addObserver(this);
 
     // Initialize index
     index = widget.index;
@@ -51,14 +54,25 @@ class _LevelPageState extends State<LevelPage> {
     _updateTimer();
 
     // Start background music
-    assetsAudioPlayer.open(Audio("assets/music/${widget.collection.music}"));
-    assetsAudioPlayer.setLoopMode(LoopMode.single);
-    assetsAudioPlayer.play();
+    _assetsAudioPlayer.open(Audio("assets/music/${widget.collection.music}"),
+        loopMode: LoopMode.single);
+    _assetsAudioPlayer.play();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused) {
+      _assetsAudioPlayer.pause();
+    } else if (state == AppLifecycleState.resumed) {
+      _assetsAudioPlayer.play();
+    }
   }
 
   @override
   void dispose() {
-    assetsAudioPlayer.stop();
+    WidgetsBinding.instance!.removeObserver(this);
+    _assetsAudioPlayer.dispose();
     timer?.cancel();
     super.dispose();
   }
