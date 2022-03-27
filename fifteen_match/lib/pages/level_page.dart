@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/models.dart';
 import '../typography/text_styles.dart';
 import '../views/views.dart';
@@ -24,11 +25,20 @@ class LevelPage extends StatefulWidget {
 }
 
 class _LevelPageState extends State<LevelPage> with WidgetsBindingObserver {
+  static const String prefMusicOnKey = 'musicOn';
+  static const String prefSoundOnKey = 'soundOn';
+
   // Main game object
   late Game game;
 
   // Index of the current level
   late int index;
+
+  // Play music flag
+  bool _musicOn = true;
+
+  // Play sound flag
+  bool _soundOn = true;
 
   // Main timer
   Timer? timer;
@@ -53,19 +63,52 @@ class _LevelPageState extends State<LevelPage> with WidgetsBindingObserver {
     // Start timer
     _updateTimer();
 
-    // Start background music
-    _assetsAudioPlayer.open(Audio("assets/music/${widget.collection.music}"),
-        loopMode: LoopMode.single);
-    _assetsAudioPlayer.play();
+    // Load background music
+    _assetsAudioPlayer.open(
+      Audio("assets/music/${widget.collection.music}"),
+      loopMode: LoopMode.single,
+      autoStart: false,
+      showNotification: true,
+    );
+    _assetsAudioPlayer.stop();
+
+    // Load settings from shared preferences
+    _loadSettings();
+  }
+
+  // Load settings from shared preferences
+  void _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Load music preference
+    if (prefs.containsKey(prefMusicOnKey)) {
+      setState(() {
+        _musicOn = prefs.getBool(prefMusicOnKey) ?? true;
+      });
+      if (_musicOn) {
+        _assetsAudioPlayer.play();
+      }
+    }
+
+    // Load sound preference
+    if (prefs.containsKey(prefSoundOnKey)) {
+      setState(() {
+        _soundOn = prefs.getBool(prefSoundOnKey) ?? true;
+      });
+    }
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.paused) {
-      _assetsAudioPlayer.pause();
+      if (_musicOn) {
+        _assetsAudioPlayer.pause();
+      }
     } else if (state == AppLifecycleState.resumed) {
-      _assetsAudioPlayer.play();
+      if (_musicOn) {
+        _assetsAudioPlayer.play();
+      }
     }
   }
 
@@ -139,7 +182,7 @@ class _LevelPageState extends State<LevelPage> with WidgetsBindingObserver {
       bool isMoved = game.move(piece);
 
       // Playing click sound
-      if (isMoved) {
+      if (_soundOn && isMoved) {
         SystemSound.play(SystemSoundType.click);
       }
     });

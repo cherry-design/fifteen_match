@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../pages/pages.dart';
 import '../views/views.dart';
@@ -19,24 +20,62 @@ class AboutPage extends StatefulWidget {
 }
 
 class _AboutPageState extends State<AboutPage> {
+  static const String prefMusicOnKey = 'musicOn';
+  static const String prefSoundOnKey = 'soundOn';
+
   // Play music flag
   bool _musicOn = true;
 
   // Play sound flag
   bool _soundOn = true;
 
+  @override
+  void initState() {
+    super.initState();
+
+    // Load settings from shared preferences
+    _loadSettings();
+  }
+
+  // Load settings from shared preferences
+  void _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Load music preference
+    if (prefs.containsKey(prefMusicOnKey)) {
+      setState(() {
+        _musicOn = prefs.getBool(prefMusicOnKey) ?? true;
+      });
+    }
+
+    // Load sound preference
+    if (prefs.containsKey(prefSoundOnKey)) {
+      setState(() {
+        _soundOn = prefs.getBool(prefSoundOnKey) ?? true;
+      });
+    }
+  }
+
   // Toggle music
-  void _toggleMusic() {
+  void _toggleMusic() async {
     setState(() {
       _musicOn = !_musicOn;
     });
+
+    // Update preferences
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool(prefMusicOnKey, _musicOn);
   }
 
   // Toggle sound
-  void _toggleSound() {
+  void _toggleSound() async {
     setState(() {
       _soundOn = !_soundOn;
     });
+
+    // Update preferences
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool(prefSoundOnKey, _soundOn);
   }
 
   // Show music copyrights
