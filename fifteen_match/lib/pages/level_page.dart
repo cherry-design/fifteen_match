@@ -51,7 +51,7 @@ class _LevelPageState extends State<LevelPage> {
     _updateTimer();
 
     // Start background music
-    assetsAudioPlayer.open(Audio("assets/music/ForestWalk.mp3"));
+    assetsAudioPlayer.open(Audio("assets/music/${widget.collection.music}"));
     assetsAudioPlayer.setLoopMode(LoopMode.single);
     assetsAudioPlayer.play();
   }

@@ -5,6 +5,7 @@ class Collection {
   final String id;
   final String name;
   final String instructions;
+  final String music;
   final PieceType pieceType;
   final bool showNumbers;
   final Palette palette;
@@ -14,6 +15,7 @@ class Collection {
     required this.id,
     required this.name,
     required this.instructions,
+    required this.music,
     required this.pieceType,
     required this.showNumbers,
     required this.palette,
@@ -36,6 +38,7 @@ class Collection {
       id: json['id'] as String,
       name: json['name'] as String,
       instructions: json['instructions'] as String,
+      music: json['music'] as String,
       pieceType: _pieceTypeFromString(json['pieceType']),
       showNumbers: json['showNumbers'] as bool,
       palette: Palette.fromJson(json['palette'] as Map<String, dynamic>),
