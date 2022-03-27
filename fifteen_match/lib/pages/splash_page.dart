@@ -6,6 +6,10 @@ import '../typography/typography.dart';
 class SplashPage extends StatelessWidget {
   const SplashPage({Key? key}) : super(key: key);
 
+  /// Title and description
+  final String title = "Match";
+  final String description = "New flavour of the famous game";
+
   @override
   Widget build(BuildContext context) {
     final orientation = MediaQuery.of(context).orientation;
@@ -63,7 +67,7 @@ class SplashPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Match",
+          title,
           style: TextStyles.title.copyWith(color: Colors.white),
         ),
         Row(
@@ -74,7 +78,7 @@ class SplashPage extends StatelessWidget {
           children: [
             const SizedBox(width: 3),
             Text(
-              "New flavour of the famous game",
+              description,
               style: TextStyles.subtitle.copyWith(color: Colors.grey),
             ),
           ],

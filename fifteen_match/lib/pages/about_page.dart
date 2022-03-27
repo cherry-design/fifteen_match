@@ -1,13 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../pages/pages.dart';
 import '../views/views.dart';
 import '../models/models.dart';
 import '../typography/typography.dart';
 
-class AboutPage extends StatelessWidget {
+class AboutPage extends StatefulWidget {
   const AboutPage({Key? key}) : super(key: key);
 
-  // Version of the app
+  /// Title and version of the app
+  final String title = "Match";
   final String version = "Version 1.0.0";
+
+  final String developerUrl = "https://www.cherry-design.com/";
+
+  @override
+  State<AboutPage> createState() => _AboutPageState();
+}
+
+class _AboutPageState extends State<AboutPage> {
+  // Play music flag
+  bool _musicOn = true;
+
+  // Play sound flag
+  bool _soundOn = true;
+
+  // Toggle music
+  void _toggleMusic() {
+    setState(() {
+      _musicOn = !_musicOn;
+    });
+  }
+
+  // Toggle sound
+  void _toggleSound() {
+    setState(() {
+      _soundOn = !_soundOn;
+    });
+  }
+
+  // Show music copyrights
+  void _showCopyrights() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return const CopyrightsPage();
+        },
+      ),
+    );
+  }
+
+  // Open developer website
+  void _openDeveloperWebsite() async {
+    if (!await launch(
+      widget.developerUrl,
+      forceWebView: false,
+      forceSafariVC: false,
+    )) {
+      throw 'Could not launch ${widget.developerUrl}';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,9 +85,11 @@ class AboutPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _headerView(),
+                      const SizedBox(height: 25),
+                      _settingsView(),
                       SizedBox(
                           height:
-                              orientation == Orientation.portrait ? 238 : 110),
+                              orientation == Orientation.portrait ? 158 : 30),
                       _copyrightView(),
                     ],
                   ),
@@ -67,7 +122,7 @@ class AboutPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Match",
+          widget.title,
           style: TextStyles.title,
         ),
         Row(
@@ -78,12 +133,58 @@ class AboutPage extends StatelessWidget {
           children: [
             const SizedBox(width: 3),
             Text(
-              version,
+              widget.version,
               style: TextStyles.subtitle,
             ),
           ],
         ),
       ],
+    );
+  }
+
+  /// Settings view
+  Widget _settingsView() {
+    return SizedBox(
+        height: 55,
+        child: Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: [
+            _settingsButton(
+              _musicOn ? Icons.music_note : Icons.music_off,
+              onTap: _toggleMusic,
+            ),
+            _settingsButton(
+              _soundOn ? Icons.volume_up : Icons.volume_off,
+              onTap: _toggleSound,
+            ),
+            _settingsButton(
+              Icons.man,
+              onTap: _showCopyrights,
+            ),
+            _settingsButton(
+              Icons.language,
+              onTap: _openDeveloperWebsite,
+            ),
+          ],
+        ));
+  }
+
+  /// Settings button
+  Widget _settingsButton(IconData iconData, {void Function()? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 43,
+        height: 43,
+        alignment: Alignment.center,
+        child: Icon(iconData, size: 30),
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          border: Border.all(color: Colors.black, width: 3),
+          shape: BoxShape.circle,
+        ),
+      ),
     );
   }
 

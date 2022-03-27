@@ -14,4 +14,10 @@ class Storage {
         .toList();
     return collections;
   }
+
+  /// Load copyrights from text file
+  static Future<String> loadCopyrights() async {
+    var copyrights = await rootBundle.loadString('assets/music/copyrights.txt');
+    return copyrights;
+  }
 }
