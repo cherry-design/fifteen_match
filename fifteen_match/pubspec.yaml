@@ -10,6 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  assets_audio_player: ^3.0.4+1
   shared_preferences: ^2.0.13
 
 dev_dependencies:
@@ -21,6 +22,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
+    - assets/music/
   fonts:
     - family: Roboto
       fonts:

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:assets_audio_player/assets_audio_player.dart';
 import '../models/models.dart';
 import '../typography/text_styles.dart';
 import '../views/views.dart';
@@ -33,6 +34,9 @@ class _LevelPageState extends State<LevelPage> {
   Timer? timer;
   bool timerActive = false;
 
+  // AudioPlayer for background music
+  final assetsAudioPlayer = AssetsAudioPlayer();
+
   @override
   void initState() {
     super.initState();
@@ -45,10 +49,16 @@ class _LevelPageState extends State<LevelPage> {
 
     // Start timer
     _updateTimer();
+
+    // Start background music
+    assetsAudioPlayer.open(Audio("assets/music/ForestWalk.mp3"));
+    assetsAudioPlayer.setLoopMode(LoopMode.single);
+    assetsAudioPlayer.play();
   }
 
   @override
   void dispose() {
+    assetsAudioPlayer.stop();
     timer?.cancel();
     super.dispose();
   }
