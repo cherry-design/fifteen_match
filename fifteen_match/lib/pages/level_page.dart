@@ -115,6 +115,7 @@ class _LevelPageState extends State<LevelPage> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance!.removeObserver(this);
+    _assetsAudioPlayer.stop();
     _assetsAudioPlayer.dispose();
     timer?.cancel();
     super.dispose();

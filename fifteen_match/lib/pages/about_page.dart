@@ -128,7 +128,7 @@ class _AboutPageState extends State<AboutPage> {
                       _settingsView(),
                       SizedBox(
                           height:
-                              orientation == Orientation.portrait ? 158 : 30),
+                              orientation == Orientation.portrait ? 160 : 28),
                       _copyrightView(),
                     ],
                   ),
