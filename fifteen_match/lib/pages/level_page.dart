@@ -67,8 +67,8 @@ class _LevelPageState extends State<LevelPage> with WidgetsBindingObserver {
     _assetsAudioPlayer.open(
       Audio("assets/music/${widget.collection.music}"),
       loopMode: LoopMode.single,
+      playInBackground: PlayInBackground.disabledRestoreOnForeground,
       autoStart: false,
-      showNotification: true,
     );
     _assetsAudioPlayer.stop();
 
@@ -114,9 +114,9 @@ class _LevelPageState extends State<LevelPage> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
     _assetsAudioPlayer.stop();
     _assetsAudioPlayer.dispose();
+    WidgetsBinding.instance!.removeObserver(this);
     timer?.cancel();
     super.dispose();
   }
@@ -430,7 +430,10 @@ class _LevelPageState extends State<LevelPage> with WidgetsBindingObserver {
       transform: Matrix4.translationValues(-8, 0, 0),
       child: IconButton(
         padding: EdgeInsets.zero,
-        onPressed: () => {Navigator.pop(context)},
+        onPressed: () {
+          _assetsAudioPlayer.stop();
+          Navigator.pop(context);
+        },
         icon: const Icon(
           Icons.arrow_back_rounded,
           size: 60.0,

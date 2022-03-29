@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.fifteen_match">
    <application
-        android:label="Fifteen Match"
+        android:label="Match"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
