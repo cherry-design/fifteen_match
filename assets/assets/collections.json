@@ -4,6 +4,7 @@
       "id": "classic",
       "name": "Classic",
       "instructions": "Variation of the famous \"Fifteen\" game. You must put each piece in its place.",
+      "music": "Illusions.mp3",
       "pieceType": "square",
       "showNumbers": true,
       "palette": {
@@ -44,6 +45,7 @@
       "id": "square",
       "name": "Square",
       "instructions": "The color of the piece and its size depend on how far it is from its place.",
+      "music": "Forest-Walk.mp3",
       "pieceType": "squareSize",
       "showNumbers": false,
       "palette": {
@@ -410,6 +412,7 @@
       "id": "round",
       "name": "Round",
       "instructions": "The color of the piece and its size depend on how far it is from its place.",
+      "music": "Lobby-Time.mp3",
       "pieceType": "roundSize",
       "showNumbers": false,
       "palette": {
@@ -776,6 +779,7 @@
       "id": "arrows",
       "name": "Arrows",
       "instructions": "Move the pieces in the direction indicated by the arrow to solve the puzzle.",
+      "music": "Spring-Flowers.mp3",
       "pieceType": "roundArrows",
       "showNumbers": false,
       "palette": {
@@ -1141,6 +1145,7 @@
       "id": "half",
       "name": "Half",
       "instructions": "The colors of the halves depend on how far they are from their place along both axes.",
+      "music": "Guitar-Gentle.mp3",
       "pieceType": "roundHalf",
       "showNumbers": false,
       "palette": {
@@ -1507,6 +1512,7 @@
       "id": "hole",
       "name": "Hole",
       "instructions": "The color of the square and the circle in the piece is depends on how far it is from its place.",
+      "music": "Subtle-Break.mp3",
       "pieceType": "squareRound",
       "showNumbers": false,
       "palette": {
