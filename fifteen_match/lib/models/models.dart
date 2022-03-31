@@ -1,3 +1,4 @@
+export 'layout.dart';
 export 'storage.dart';
 export 'game.dart';
 export 'collection.dart';

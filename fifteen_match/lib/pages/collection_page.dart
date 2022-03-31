@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import '../pages/pages.dart';
 import '../models/models.dart';
@@ -43,9 +45,6 @@ class _CollectionPageState extends State<CollectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final orientation = MediaQuery.of(context).orientation;
-
     return Scaffold(
       body: Stack(children: [
         BackgroundView(
@@ -55,35 +54,70 @@ class _CollectionPageState extends State<CollectionPage> {
         SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
-            child: Row(
-              children: [
-                SizedBox(width: orientation == Orientation.portrait ? 0 : 250),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _headerView(),
-                    const SizedBox(height: 25),
-                    Visibility(
-                      visible: orientation == Orientation.portrait,
-                      child: SizedBox(
-                        width: screenWidth * 0.75,
-                        child: Text(
-                          widget.collection.instructions,
-                          style: TextStyles.body.copyWith(
-                            color: widget.collection.palette.mainColor,
+            child: LayoutBuilder(builder: (context, constraints) {
+              Orientation orientation =
+                  constraints.maxHeight > constraints.maxWidth
+                      ? Orientation.portrait
+                      : Orientation.landscape;
+              return Align(
+                alignment: Alignment.bottomLeft,
+                child: FractionallySizedBox(
+                  alignment: Alignment.bottomLeft,
+                  heightFactor: constraints.maxHeight < Layout.maxHeight
+                      ? 1
+                      : Layout.verticalRatio,
+                  child: Row(
+                    children: [
+                      SizedBox(
+                          width: constraints.maxWidth < Layout.maxWidth
+                              ? 0
+                              : Layout.leftPadding),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _headerView(),
+                          const SizedBox(height: 25),
+                          Visibility(
+                            visible: orientation == Orientation.portrait,
+                            child: SizedBox(
+                              width: constraints.maxWidth < Layout.maxWidth
+                                  ? 0.75 * constraints.maxWidth
+                                  : 0.75 * constraints.maxWidth -
+                                      Layout.leftPadding,
+                              child: Text(
+                                widget.collection.instructions,
+                                style: TextStyles.body.copyWith(
+                                  color: widget.collection.palette.mainColor,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
+                          SizedBox(
+                              height:
+                                  orientation == Orientation.portrait ? 35 : 0),
+                          SizedBox(
+                              width: constraints.maxWidth < Layout.maxWidth
+                                  ? constraints.maxWidth
+                                  : min(
+                                      constraints.maxWidth - Layout.leftPadding,
+                                      Layout.maxWidthLevels),
+                              child: _levelsView(
+                                  levels: widget.collection.levels)),
+                          Builder(builder: (context) {
+                            if (constraints.maxHeight < Layout.maxHeight) {
+                              return const SizedBox(height: 27);
+                            } else {
+                              return const Spacer();
+                            }
+                          }),
+                        ],
                       ),
-                    ),
-                    SizedBox(
-                        height: orientation == Orientation.portrait ? 35 : 0),
-                    _levelsView(levels: widget.collection.levels),
-                    const SizedBox(height: 5),
-                  ],
+                    ],
+                  ),
                 ),
-              ],
-            ),
+              );
+            }),
           ),
         )
       ]),
@@ -141,29 +175,15 @@ class _CollectionPageState extends State<CollectionPage> {
 
   /// Levels
   Widget _levelsView({required List<Level> levels}) {
-    final orientation = MediaQuery.of(context).orientation;
-    final screenSize = MediaQuery.of(context).size;
-    final screenPadding = MediaQuery.of(context).padding;
-
     List<Widget> levelsTiles = levels
         .map((level) =>
             _levelButton(number: level.id, highlight: level.isSolved))
         .toList();
 
-    return Container(
-      width: orientation == Orientation.portrait
-          ? screenSize.width - 40
-          : screenSize.width - 290 - screenPadding.left - screenPadding.right,
-      constraints: BoxConstraints(
-          minHeight:
-              orientation == Orientation.portrait || screenSize.width <= 700
-                  ? 150
-                  : 120),
-      child: Wrap(
-        spacing: 12,
-        runSpacing: 12,
-        children: levelsTiles,
-      ),
+    return Wrap(
+      spacing: 12,
+      runSpacing: 12,
+      children: levelsTiles,
     );
   }
 

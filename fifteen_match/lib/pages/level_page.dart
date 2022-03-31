@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:assets_audio_player/assets_audio_player.dart';
@@ -73,6 +74,7 @@ class _LevelPageState extends State<LevelPage> with WidgetsBindingObserver {
     _assetsAudioPlayer.stop();
 
     // Load settings from shared preferences
+// DEBUG
     _loadSettings();
   }
 
@@ -271,16 +273,22 @@ class _LevelPageState extends State<LevelPage> with WidgetsBindingObserver {
           colors: widget.collection.palette.gradient,
         ),
         SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Builder(
-              builder: (BuildContext context) {
-                if (orientation == Orientation.portrait) {
-                  return _portraitView();
-                } else {
-                  return _landscapeView();
-                }
-              },
+          child: Align(
+            alignment: Alignment.center,
+            child: SizedBox(
+              width: Layout.maxWidthLandscape,
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Builder(
+                  builder: (BuildContext context) {
+                    if (orientation == Orientation.portrait) {
+                      return _portraitView();
+                    } else {
+                      return _landscapeView();
+                    }
+                  },
+                ),
+              ),
             ),
           ),
         )
@@ -290,25 +298,39 @@ class _LevelPageState extends State<LevelPage> with WidgetsBindingObserver {
 
   /// Portrait view of the game
   Widget _portraitView() {
-    return Column(
+    return Flex(
+      direction: Axis.vertical,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         _headerView(),
-        Column(
-          children: [
-            _stepsAndTimerView(),
-            const SizedBox(height: 28),
-            GameView(
-              gridSize: game.gridSize,
-              pieces: game.pieces,
-              palette: widget.collection.palette,
-              pieceType: widget.collection.pieceType,
-              showNumbers: widget.collection.showNumbers,
-              isSolved: game.isSolved,
-              onClick: _onClickPiece,
-              onDrag: _onDragPiece,
-            ),
-          ],
+        SizedBox(
+          width: 480,
+          child: Column(
+            children: [
+              _stepsAndTimerView(),
+              const SizedBox(height: 28),
+              LayoutBuilder(builder: (context, constraints) {
+                double boardWidth =
+                    min(constraints.maxWidth, constraints.maxHeight);
+                return Align(
+                  child: SizedBox(
+                    width: boardWidth,
+                    height: boardWidth,
+                    child: GameView(
+                      gridSize: game.gridSize,
+                      pieces: game.pieces,
+                      palette: widget.collection.palette,
+                      pieceType: widget.collection.pieceType,
+                      showNumbers: widget.collection.showNumbers,
+                      isSolved: game.isSolved,
+                      onClick: _onClickPiece,
+                      onDrag: _onDragPiece,
+                    ),
+                  ),
+                );
+              }),
+            ],
+          ),
         ),
         ColorsView(
             gridSize: game.gridSize,
@@ -326,65 +348,136 @@ class _LevelPageState extends State<LevelPage> with WidgetsBindingObserver {
       children: [
         Expanded(
           flex: 1,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _headerView(),
-              FractionallySizedBox(
-                widthFactor: 0.9,
-                child: Text(
-                  widget.collection.instructions,
-                  style: TextStyles.body.copyWith(
-                    color: widget.collection.palette.mainColor,
-                  ),
+          child: LayoutBuilder(builder: (context, constraints) {
+            // Big layout flag
+            bool isBigLayout = (constraints.maxHeight > Layout.maxHeight);
+            return Align(
+              alignment: Alignment.bottomLeft,
+              child: FractionallySizedBox(
+                alignment: Alignment.bottomLeft,
+                heightFactor: isBigLayout ? Layout.verticalRatio : 1,
+                child: Column(
+                  mainAxisAlignment: isBigLayout
+                      ? MainAxisAlignment.start
+                      : MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _headerView(isBigLayout: isBigLayout),
+                    SizedBox(height: isBigLayout ? 25 : 0),
+                    FractionallySizedBox(
+                      widthFactor: 0.9,
+                      child: Text(
+                        widget.collection.instructions,
+                        style: TextStyles.body.copyWith(
+                          color: widget.collection.palette.mainColor,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: isBigLayout ? 25 : 0),
+                    Builder(builder: (context) {
+                      if (isBigLayout) {
+                        return Column(
+                          children: [
+                            _levelsView(levels: widget.collection.levels),
+                          ],
+                        );
+                      } else {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _stepsAndTimerView(),
+                            const SizedBox(height: 10),
+                            ColorsView(
+                                gridSize: game.gridSize,
+                                pieceType: widget.collection.pieceType,
+                                palette: widget.collection.palette),
+                          ],
+                        );
+                      }
+                    }),
+                  ],
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _stepsAndTimerView(),
-                  const SizedBox(height: 10),
-                  ColorsView(
-                      gridSize: game.gridSize,
-                      pieceType: widget.collection.pieceType,
-                      palette: widget.collection.palette),
-                ],
-              ),
-            ],
-          ),
+            );
+          }),
         ),
         const SizedBox(width: 50),
         Expanded(
           flex: 1,
-          child: GameView(
-            gridSize: game.gridSize,
-            pieces: game.pieces,
-            palette: widget.collection.palette,
-            pieceType: widget.collection.pieceType,
-            showNumbers: widget.collection.showNumbers,
-            isSolved: game.isSolved,
-            onClick: _onClickPiece,
-            onDrag: _onDragPiece,
-          ),
+          child: LayoutBuilder(builder: (context, constraints) {
+            bool isBigLayout = (constraints.maxHeight > Layout.maxHeight);
+            double boardWidth =
+                min(constraints.maxWidth, constraints.maxHeight);
+            return Align(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Visibility(
+                    visible: isBigLayout,
+                    child: Column(
+                      children: [
+                        _stepsAndTimerView(),
+                        const SizedBox(height: 35),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: boardWidth,
+                    height: boardWidth,
+                    child: GameView(
+                      gridSize: game.gridSize,
+                      pieces: game.pieces,
+                      palette: widget.collection.palette,
+                      pieceType: widget.collection.pieceType,
+                      showNumbers: widget.collection.showNumbers,
+                      isSolved: game.isSolved,
+                      onClick: _onClickPiece,
+                      onDrag: _onDragPiece,
+                    ),
+                  ),
+                  Visibility(
+                    visible: isBigLayout,
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 35),
+                        ColorsView(
+                          gridSize: game.gridSize,
+                          pieceType: widget.collection.pieceType,
+                          palette: widget.collection.palette,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
         ),
       ],
     );
   }
 
   /// Header
-  Widget _headerView() {
+  Widget _headerView({bool isBigLayout = false}) {
     final screenHeight = MediaQuery.of(context).size.height;
     final orientation = MediaQuery.of(context).orientation;
 
     // Get current level
     Level level = widget.collection.levels[index];
 
+    // Calculate header color
+    Palette palette = widget.collection.palette;
+    Color headerColor = (isBigLayout || palette.theme == PaletteTheme.dark)
+        ? palette.mainColor
+        : palette.alternateColor;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: isBigLayout
+              ? MainAxisAlignment.start
+              : MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Row(
@@ -394,19 +487,21 @@ class _LevelPageState extends State<LevelPage> with WidgetsBindingObserver {
                         orientation == Orientation.portrait,
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 12, right: 12),
-                      child: _backButton(),
+                      child: _backButton(color: headerColor),
                     )),
                 Text(
                   widget.collection.name,
-                  style: TextStyles.title.copyWith(
-                    color: Colors.white,
-                  ),
+                  style: TextStyles.title.copyWith(color: headerColor),
                 ),
               ],
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: _levelNumber(number: level.id, highlight: level.isSolved),
+              padding: const EdgeInsets.only(top: 10, left: 24),
+              child: _levelNumber(
+                number: level.id,
+                highlight: level.isSolved,
+                color: headerColor,
+              ),
             ),
           ],
         ),
@@ -419,13 +514,13 @@ class _LevelPageState extends State<LevelPage> with WidgetsBindingObserver {
         ),
         Visibility(
             visible: screenHeight > 700 || orientation == Orientation.landscape,
-            child: _backButton()),
+            child: _backButton(color: headerColor)),
       ],
     );
   }
 
   /// Back button
-  Widget _backButton() {
+  Widget _backButton({Color color = Colors.white}) {
     return Transform(
       transform: Matrix4.translationValues(-8, 0, 0),
       child: IconButton(
@@ -434,10 +529,10 @@ class _LevelPageState extends State<LevelPage> with WidgetsBindingObserver {
           _assetsAudioPlayer.stop();
           Navigator.pop(context);
         },
-        icon: const Icon(
+        icon: Icon(
           Icons.arrow_back_rounded,
           size: 60.0,
-          color: Colors.white,
+          color: color,
         ),
       ),
     );
@@ -469,8 +564,61 @@ class _LevelPageState extends State<LevelPage> with WidgetsBindingObserver {
     );
   }
 
+  /// Levels
+  Widget _levelsView({required List<Level> levels}) {
+    List<Widget> levelsTiles = levels
+        .map((level) =>
+            _levelButton(number: level.id, highlight: level.isSolved))
+        .toList();
+
+    return Wrap(
+      spacing: 12,
+      runSpacing: 12,
+      children: levelsTiles,
+    );
+  }
+
+  /// Level button
+  Widget _levelButton({required int number, bool highlight = false}) {
+    // Get the main and alternate colors
+    Color mainColor = widget.collection.palette.mainColor;
+    Color alternateColor = widget.collection.palette.alternateColor;
+
+    return GestureDetector(
+      onTap: () => {
+        setState(() {
+          index = number;
+          _initGame();
+        })
+      },
+      child: Container(
+        width: 43,
+        height: 43,
+        alignment: Alignment.center,
+        child: Text(
+          "${number + 1}",
+          style: TextStyles.number.copyWith(
+            color: highlight ? alternateColor : mainColor,
+          ),
+        ),
+        decoration: BoxDecoration(
+          color: highlight ? mainColor : Colors.transparent,
+          border: Border.all(color: mainColor, width: 3),
+          shape: BoxShape.circle,
+        ),
+      ),
+    );
+  }
+
   /// Level number
-  Widget _levelNumber({required int number, bool highlight = false}) {
+  Widget _levelNumber(
+      {required int number,
+      bool highlight = false,
+      Color color = Colors.white}) {
+    // Calculate color for highlight
+    Color highlightColor =
+        (color == Colors.white) ? Colors.black : Colors.white;
+
     return Container(
       width: 43,
       height: 43,
@@ -478,12 +626,12 @@ class _LevelPageState extends State<LevelPage> with WidgetsBindingObserver {
       child: Text(
         "${number + 1}",
         style: TextStyles.number.copyWith(
-          color: highlight ? Colors.black : Colors.white,
+          color: highlight ? highlightColor : color,
         ),
       ),
       decoration: BoxDecoration(
-        color: highlight ? Colors.white : Colors.transparent,
-        border: Border.all(color: Colors.white, width: 3),
+        color: highlight ? color : Colors.transparent,
+        border: Border.all(color: color, width: 3),
         shape: BoxShape.circle,
       ),
     );

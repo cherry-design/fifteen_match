@@ -12,7 +12,10 @@ class AboutPage extends StatefulWidget {
   /// Title and version of the app
   final String title = "Match";
   final String version = "Version 1.0.0";
+  final String programming = "Programming & Design";
+  final String copyright = "2022 © Studio \"Cherry-Design\"";
 
+  /// Developer website url
   final String developerUrl = "https://www.cherry-design.com/";
 
   @override
@@ -103,8 +106,6 @@ class _AboutPageState extends State<AboutPage> {
 
   @override
   Widget build(BuildContext context) {
-    final orientation = MediaQuery.of(context).orientation;
-
     return Scaffold(
       body: Stack(
         children: [
@@ -115,25 +116,42 @@ class _AboutPageState extends State<AboutPage> {
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
-              child: Row(
-                children: [
-                  SizedBox(
-                      width: orientation == Orientation.portrait ? 0 : 250),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _headerView(),
-                      const SizedBox(height: 25),
-                      _settingsView(),
-                      SizedBox(
-                          height:
-                              orientation == Orientation.portrait ? 160 : 28),
-                      _copyrightView(),
-                    ],
+              child: LayoutBuilder(builder: (context, constraints) {
+                return Align(
+                  alignment: Alignment.bottomLeft,
+                  child: FractionallySizedBox(
+                    alignment: Alignment.bottomLeft,
+                    heightFactor: constraints.maxHeight < Layout.maxHeight
+                        ? 1
+                        : Layout.verticalRatio,
+                    child: Row(
+                      children: [
+                        SizedBox(
+                            width: constraints.maxWidth < Layout.maxWidth
+                                ? 0
+                                : Layout.leftPadding),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _headerView(),
+                            const SizedBox(height: 25),
+                            _settingsView(),
+                            Builder(builder: (context) {
+                              if (constraints.maxHeight < Layout.maxHeight) {
+                                return const SizedBox(height: 28);
+                              } else {
+                                return const Spacer();
+                              }
+                            }),
+                            _copyrightView(),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                );
+              }),
             ),
           ),
         ],
@@ -233,12 +251,12 @@ class _AboutPageState extends State<AboutPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Programming & Design",
+          widget.programming,
           style: TextStyles.small,
         ),
         const SizedBox(height: 3),
         Text(
-          "2022 © Studio \"Cherry-Design\"",
+          widget.copyright,
           style: TextStyles.small.copyWith(color: Colors.grey),
         ),
       ],

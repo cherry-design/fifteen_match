@@ -8,12 +8,10 @@ class SplashPage extends StatelessWidget {
 
   /// Title and description
   final String title = "Match";
-  final String description = "New flavour of the famous game";
+  final String subtitle = "New flavour of the famous game";
 
   @override
   Widget build(BuildContext context) {
-    final orientation = MediaQuery.of(context).orientation;
-
     return Scaffold(
       body: Stack(
         children: [
@@ -24,22 +22,39 @@ class SplashPage extends StatelessWidget {
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
-              child: Row(
-                children: [
-                  SizedBox(
-                      width: orientation == Orientation.portrait ? 0 : 250),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _headerView(),
-                      SizedBox(
-                          height:
-                              orientation == Orientation.portrait ? 278 : 140),
-                    ],
+              child: LayoutBuilder(builder: (context, constraints) {
+                return Align(
+                  alignment: Alignment.bottomLeft,
+                  child: FractionallySizedBox(
+                    alignment: Alignment.bottomLeft,
+                    heightFactor: constraints.maxHeight < Layout.maxHeight
+                        ? 1
+                        : Layout.verticalRatio,
+                    child: Row(
+                      children: [
+                        SizedBox(
+                            width: constraints.maxWidth < Layout.maxWidth
+                                ? 0
+                                : Layout.leftPadding),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _headerView(),
+                            Builder(builder: (context) {
+                              if (constraints.maxHeight < Layout.maxHeight) {
+                                return const SizedBox(height: 150);
+                              } else {
+                                return const Spacer();
+                              }
+                            }),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                );
+              }),
             ),
           ),
         ],
@@ -78,7 +93,7 @@ class SplashPage extends StatelessWidget {
           children: [
             const SizedBox(width: 3),
             Text(
-              description,
+              subtitle,
               style: TextStyles.subtitle.copyWith(color: Colors.grey),
             ),
           ],

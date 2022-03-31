@@ -50,35 +50,35 @@ class GameView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Calculate mininmum size of the board
-    final screenSize = MediaQuery.of(context).size;
-    final boardWidth = min(screenSize.width, screenSize.height);
-
     // List of the pieces to show
     List<Widget> piecesTiles = pieces
-        .map((piece) => PieceView(
-              piece: piece,
-              colors: palette.gameColors(gridSize: gridSize),
-              pieceType: pieceType,
-              showNumbers: showNumbers || piece.isCorrect,
-              isSolved: isSolved,
-              onClick: () => onClick(piece),
-              onDrag: (details) => onDrag(piece, details),
+        .map((piece) => AnimatedSwitcher(
+              // DEBUG
+              duration: const Duration(milliseconds: 250),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return ScaleTransition(scale: animation, child: child);
+              },
+              child: PieceView(
+                key: ValueKey(piece.isEmpty),
+                piece: piece,
+                colors: palette.gameColors(gridSize: gridSize),
+                pieceType: pieceType,
+                showNumbers: showNumbers || piece.isCorrect,
+                isSolved: isSolved,
+                onClick: () => onClick(piece),
+                onDrag: (details) => onDrag(piece, details),
+              ),
             ))
         .toList();
 
-    return SizedBox(
-      width: boardWidth,
-      height: boardWidth,
-      child: GridView.count(
-        padding: EdgeInsets.zero,
-        mainAxisSpacing: spacing,
-        crossAxisSpacing: spacing,
-        physics: const NeverScrollableScrollPhysics(),
-        crossAxisCount: gridSize,
-        children: piecesTiles,
-        clipBehavior: Clip.none,
-      ),
+    return GridView.count(
+      padding: EdgeInsets.zero,
+      mainAxisSpacing: spacing,
+      crossAxisSpacing: spacing,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: gridSize,
+      children: piecesTiles,
+      clipBehavior: Clip.none,
     );
   }
 }

@@ -17,8 +17,6 @@ class CopyrightsPage extends StatefulWidget {
 class _CopyrightsPageState extends State<CopyrightsPage> {
   @override
   Widget build(BuildContext context) {
-    final orientation = MediaQuery.of(context).orientation;
-
     return Scaffold(
       body: Stack(
         children: [
@@ -29,21 +27,32 @@ class _CopyrightsPageState extends State<CopyrightsPage> {
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
-              child: Row(
-                children: [
-                  SizedBox(
-                      width: orientation == Orientation.portrait ? 0 : 250),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _headerView(),
-                      const SizedBox(height: 25),
-                      Expanded(child: _copyrightsView()),
-                    ],
-                  ),
-                ],
-              ),
+              child: LayoutBuilder(builder: (context, constraints) {
+                return Row(
+                  children: [
+                    SizedBox(
+                        width: constraints.maxWidth < Layout.maxWidth
+                            ? 0
+                            : Layout.leftPadding),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _headerView(),
+                        const SizedBox(height: 25),
+                        Expanded(
+                          child: SizedBox(
+                            width: constraints.maxWidth < Layout.maxWidth
+                                ? constraints.maxWidth
+                                : constraints.maxWidth - Layout.leftPadding,
+                            child: _copyrightsView(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              }),
             ),
           ),
         ],
@@ -66,10 +75,11 @@ class _CopyrightsPageState extends State<CopyrightsPage> {
             Row(
               children: [
                 Visibility(
+                    // DEBUG
                     visible: screenHeight <= 700 &&
                         orientation == Orientation.portrait,
                     child: Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.only(bottom: 12, right: 12),
                       child: _backButton(),
                     )),
                 Text(
@@ -128,28 +138,19 @@ class _CopyrightsPageState extends State<CopyrightsPage> {
 
   /// Copyrights view
   Widget _copyrightsView() {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final orientation = MediaQuery.of(context).orientation;
-    final screenPadding = MediaQuery.of(context).padding;
-
-    return SizedBox(
-      width: orientation == Orientation.portrait
-          ? screenWidth - 40
-          : screenWidth - 290 - screenPadding.left - screenPadding.right,
-      child: SingleChildScrollView(
-        child: FutureBuilder(
-            future: Storage.loadCopyrights(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Text(
-                  snapshot.data as String,
-                  style: TextStyles.small,
-                );
-              } else {
-                return const Text("File not found");
-              }
-            }),
-      ),
+    return SingleChildScrollView(
+      child: FutureBuilder(
+          future: Storage.loadCopyrights(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Text(
+                snapshot.data as String,
+                style: TextStyles.small,
+              );
+            } else {
+              return const Text("File not found");
+            }
+          }),
     );
   }
 }
