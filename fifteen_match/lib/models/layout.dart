@@ -10,7 +10,8 @@ class Layout {
   // Vertical ratio to position on the big screens
   static const double verticalRatio = 0.55;
 
-  // Maximum width of the level page in landscape orientation
+  // Maximum width of the level page in portrait and landscape orientation
+  static const double maxWidthPortrait = 704;
   static const double maxWidthLandscape = 960;
 
   // Maximum width of the levels grid on collection page

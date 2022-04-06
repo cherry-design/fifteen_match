@@ -276,7 +276,12 @@ class _LevelPageState extends State<LevelPage> with WidgetsBindingObserver {
           child: Align(
             alignment: Alignment.center,
             child: SizedBox(
-              width: Layout.maxWidthLandscape,
+              width: orientation == Orientation.portrait
+                  ? Layout.maxWidthPortrait
+                  : Layout.maxWidthLandscape,
+              height: orientation == Orientation.portrait
+                  ? Layout.maxWidthLandscape
+                  : Layout.maxWidthPortrait,
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Builder(
@@ -302,7 +307,52 @@ class _LevelPageState extends State<LevelPage> with WidgetsBindingObserver {
       direction: Axis.vertical,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _headerView(),
+        LayoutBuilder(builder: (context, constraints) {
+          // Big layout flag
+          bool isBigLayout = (constraints.maxWidth > Layout.maxWidth);
+          return Align(
+            alignment: Alignment.topLeft,
+            child: Flex(
+              direction: Axis.horizontal,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _headerView(isBigLayout: isBigLayout),
+                      SizedBox(height: isBigLayout ? 25 : 0),
+                      Visibility(
+                        visible: false, //DEBUG: isBigLayout ? true : false,
+                        child: FractionallySizedBox(
+                          widthFactor: 0.8,
+                          child: Text(
+                            widget.collection.instructions,
+                            style: TextStyles.body.copyWith(
+                              color: widget.collection.palette.mainColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Visibility(
+                  visible: isBigLayout ? true : false,
+                  child: Expanded(
+                    flex: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 18, left: 10),
+                      child: _levelsView(levels: widget.collection.levels),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
         SizedBox(
           width: 480,
           child: Column(
@@ -329,6 +379,11 @@ class _LevelPageState extends State<LevelPage> with WidgetsBindingObserver {
                   ),
                 );
               }),
+              // const SizedBox(height: 35),
+              // ColorsView(
+              //     gridSize: game.gridSize,
+              //     pieceType: widget.collection.pieceType,
+              //     palette: widget.collection.palette),
             ],
           ),
         ),

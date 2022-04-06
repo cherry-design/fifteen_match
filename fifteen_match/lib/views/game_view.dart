@@ -1,7 +1,4 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-
 import '../models/models.dart';
 import '../views/views.dart';
 
