@@ -12,3 +12,5 @@ Screenshots of the app.
 
 ![Dark Theme](images/square_collection.png) 
 ![Dark Theme](images/square_level.png)
+
+[Puzzle Hack Certificate](https://www.credential.net/4c11cf84-5b57-4184-b585-70dfaf5dcd0a)
